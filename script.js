@@ -38,11 +38,6 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_col
             let bboxscaled = turf.bbox(envelopescaled);
             const myhex = turf.hexGrid(bboxscaled, 0.5, { units: 'kilometers' });
 
-            map.addSource('hexgrid', {
-                type: 'geojson',
-                data: myhex
-            });
-
             const collected = turf.collect(myhex, myPoints, '_id', 'values'); // collect points that fall within hexagons
 
             collected.features.forEach((feature) => {
@@ -52,16 +47,27 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_col
                 }
             });
 
+            map.addSource('hexgrid', {
+                type: 'geojson',
+                data: myhex
+            });
+
             map.addLayer({
                 'id': 'hexgrid',
                 'type': 'fill',
                 'source': 'hexgrid',
                 'paint': {
                     'fill-opacity': 0.5,
-                    'fill-color': [
-                        'case',
-                        ['<=', ['get', 'COUNT'], 0], '#FFFFCC',
-                        '#FF0000'
+                    'fill-color': 
+                    [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'COUNT'],
+                        0, '#FFFFCC', // color for zero collisions
+                        maxcollis * 0.25, '#FFCC00',
+                        maxcollis * 0.5, '#FF9900',
+                        maxcollis * 0.75, '#FF6600',
+                        maxcollis, '#800026' // color for max collisions
                     ],
                     'fill-outline-color': '#000000'
                 }
