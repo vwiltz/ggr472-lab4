@@ -23,15 +23,15 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_col
                 data: myPoints
             });
 
-            map.addLayer({
-                'id': 'toronto-collisions',
-                'type': 'circle',
-                'source': 'collisions',
-                'paint': {
-                    'circle-radius': 2,
-                    'circle-color': '#FF0000'
-                }
-            });
+            // map.addLayer({
+            //     'id': 'toronto-collisions',
+            //     'type': 'circle',
+            //     'source': 'collisions',
+            //     'paint': {
+            //         'circle-radius': 2,
+            //         'circle-color': '#FF0000'
+            //     }
+            // });
 
             let bbox = turf.bbox(myPoints); // find bounding box
             let envelopescaled = turf.transformScale(turf.bboxPolygon(bbox), 1.1);
