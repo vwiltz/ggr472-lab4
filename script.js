@@ -10,12 +10,12 @@ const map = new mapboxgl.Map({
 map.addControl(new mapboxgl.NavigationControl());
 
 let myPoints;
+let maxcollis = 0; // initialize variable to store the maximum count of points
 
-fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/data/redlight_cams.geojson')
+fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_collision_06-21.geojson')
     .then(response => response.json())
     .then(response => {
-        console.log(response); // check response in console
-        myPoints = response; // store geojson in variable using url from fetch response
+        myPoints = response; 
 
         map.on('load', () => {
             map.addSource('collisions', {
@@ -29,27 +29,27 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/data/redli
                 'source': 'collisions',
                 'paint': {
                     'circle-radius': 2,
-                    'circle-color': '#000000'
+                    'circle-color': '#FF0000'
                 }
             });
 
-            let bboxgeojson;
-            let bbox = turf.envelope(myPoints);
-            bboxgeojson = { "type": "FeatureCollection", "features": [bbox] };
-
-            console.log(bbox)
-            console.log(bbox.geometry.coordinates)
-
-            const coordinates = bbox.geometry.coordinates[0];
-            const minX = coordinates[0][0];
-            const minY = coordinates[0][1];
-            const maxX = coordinates[2][0];
-            const maxY = coordinates[2][1];
-            const hexgrid = turf.hexGrid([minX, minY, maxX, maxY], { size: 0.5, units: 'kilometers' });
+            let bbox = turf.bbox(myPoints); // find bounding box
+            let envelopescaled = turf.transformScale(turf.bboxPolygon(bbox), 1.1);
+            let bboxscaled = turf.bbox(envelopescaled);
+            const myhex = turf.hexGrid(bboxscaled, 0.5, { units: 'kilometers' });
 
             map.addSource('hexgrid', {
                 type: 'geojson',
-                data: hexgrid
+                data: myhex
+            });
+
+            const collected = turf.collect(myhex, myPoints, '_id', 'values'); // collect points that fall within hexagons
+
+            collected.features.forEach((feature) => {
+                feature.properties.COUNT = feature.properties.values.length;
+                if (feature.properties.COUNT > maxcollis) {
+                    maxcollis = feature.properties.COUNT;
+                }
             });
 
             map.addLayer({
@@ -57,12 +57,19 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/data/redli
                 'type': 'fill',
                 'source': 'hexgrid',
                 'paint': {
-                    'fill-opacity': 0.1,
-                    'fill-color': '#00ff00'
+                    'fill-opacity': 0.5,
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'COUNT'],
+                        0, '#FFFFCC', // color for zero collisions
+                        maxcollis * 0.25, '#FFCC00',
+                        maxcollis * 0.5, '#FF9900',
+                        maxcollis * 0.75, '#FF6600',
+                        maxcollis, '#800026' // color for max collisions
+                    ],
+                    'fill-outline-color': '#000000'
                 }
             });
-
-
-
-        }); // map load event listener closing brace 
+        });
     });
