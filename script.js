@@ -57,17 +57,17 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_col
                 'type': 'fill',
                 'source': 'hexgrid',
                 'paint': {
-                    'fill-opacity': 0.5,
+                    'fill-opacity': 0.7,
                     'fill-color':
                         [
                             'interpolate',
                             ['linear'],
                             ['get', 'COUNT'],
-                            0, '#FFFFCC', // color for zero collisions
-                            maxcollis * 0.25, '#FFCC00',
-                            maxcollis * 0.5, '#FF9900',
-                            maxcollis * 0.75, '#FF6600',
-                            maxcollis, '#800026' // color for max collisions
+                            0, '#ffffcc', // colour for zero collisions
+                            maxcollis * 0.25, '#fecc5c',
+                            maxcollis * 0.5, '#fd8d3c',
+                            maxcollis * 0.75, '#f03b20',
+                            maxcollis, '#bd0026' // colour for max collisions
                         ],
                     'fill-outline-color': '#000000'
                 }
