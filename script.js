@@ -59,14 +59,9 @@ fetch('https://raw.githubusercontent.com/vwiltz/ggr472-lab4/main/data/pedcyc_col
                 'paint': {
                     'fill-opacity': 0.5,
                     'fill-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['get', 'COUNT'],
-                        0, '#FFFFCC', // color for zero collisions
-                        maxcollis * 0.25, '#FFCC00',
-                        maxcollis * 0.5, '#FF9900',
-                        maxcollis * 0.75, '#FF6600',
-                        maxcollis, '#800026' // color for max collisions
+                        'case',
+                        ['<=', ['get', 'COUNT'], 0], '#FFFFCC',
+                        '#FF0000'
                     ],
                     'fill-outline-color': '#000000'
                 }
